@@ -25,11 +25,19 @@ interval = 60
 
 # Mysqlへのコネクションの作成
 conn = mydb.connect(
-    host='localhost',
+    # host='localhost',
+    # port='3306',
+    # user='root',
+    # password='',
+    # database='bitflyer'
+        # host='localhost',
     port='3306',
-    user='root',
-    password='',
-    database='bitflyer'
+    db='db-bitcoin01',
+    # user='root',
+    user='nicoryo',
+    # password='',
+    password='Kaitou1412',
+    # database='bitflyer'
 )
 # カーソルを取得する
 cur = conn.cursor()
