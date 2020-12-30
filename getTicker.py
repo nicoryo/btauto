@@ -5,7 +5,7 @@ from time import sleep
 
 # APIへアクセス
 api = pybitflyer.API(
-  # api_key="UbaTVuzy11W2hsooUS4i77", api_secret="8xOWjqX5jbgW0SRc8D+8h21//hnmDp984oBve1HEjZI="
+  
   )
 # 取得するデータを選択する
 option = ['timestamp','ltp']
