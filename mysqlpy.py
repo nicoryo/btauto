@@ -1,5 +1,6 @@
 import mysql.connector as mydb
 
+# coding:utf-8
 # コネクションの作成
 conn = mydb.connect(
     # host='localhost',
