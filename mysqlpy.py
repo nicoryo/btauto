@@ -4,6 +4,7 @@ import mysql.connector as mydb
 # コネクションの作成
 conn = mydb.connect(
     # host='localhost',
+    host='db-bitcoin01.chsa19zjxzmw.ap-northeast-1.rds.amazonaws.com'
     port='3306',
     db='db-bitcoin01',
     # user='root',
@@ -11,7 +12,7 @@ conn = mydb.connect(
     # password='',
     password='Kaitou1412',
     # database='bitflyer'
-    charset=”utf8"
+    charset="utf8"
 )
 
 # カーソルを取得する
