@@ -8,8 +8,9 @@ conn = mydb.connect(
     # user='root',
     user='nicoryo',
     # password='',
-    password='Kaitou1412'
+    password='Kaitou1412',
     # database='bitflyer'
+    charset=”utf8"
 )
 
 # カーソルを取得する
