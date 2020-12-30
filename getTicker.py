@@ -21,7 +21,7 @@ option = ['timestamp','ltp']
 
 
 # 取得間隔(秒)
-interval = 60
+interval = 10
 
 # Mysqlへのコネクションの作成
 conn = mydb.connect(
