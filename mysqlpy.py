@@ -20,6 +20,14 @@ conn = mydb.connect(
     # database='bitflyer'
     charset="utf8"
 )
+# conn = mydb.connect(
+#     host='localhost',
+#     port='3306',
+#     user='root',
+#     password='',
+#     database='bitflyer',
+#     charset="utf8"
+# )
 
 # カーソルを取得する
 cur = conn.cursor()
@@ -37,13 +45,14 @@ cur.execute(
 conn.commit()
 
 
+
 cur.execute(
     """
     CREATE TABLE IF NOT EXISTS 1min_table(
         id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         timestamp DATETIME,
-        BUYSig VARCHAR(25),
-        SELLSig VARCHAR(25),
+        BUYSig BOOLEAN,
+        SELLSig BOOLEAN,
         open INT,
         close INT,
         max INT,
@@ -62,8 +71,8 @@ cur.execute(
     CREATE TABLE IF NOT EXISTS 5min_table(
         id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         timestamp DATETIME,
-        BUYSig VARCHAR(25),
-        SELLSig VARCHAR(25),
+        BUYSig BOOLEAN,
+        SELLSig BOOLEAN,
         open INT,
         close INT,
         max INT,

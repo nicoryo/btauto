@@ -4,6 +4,7 @@ from time import sleep
 import pandas as pd
 import os
 from dotenv import load_dotenv
+import math
 
 # 取得間隔(秒)
 interval = 60*5
@@ -26,6 +27,14 @@ conn = mydb.connect(
     # database='bitflyer'
     charset="utf8"
 )
+# conn = mydb.connect(
+#     host='localhost',
+#     port='3306',
+#     user='root',
+#     password='',
+#     database='bitflyer',
+#     charset="utf8"
+# )
 # カーソルを取得する
 cur = conn.cursor()
 
@@ -69,17 +78,25 @@ while True:
     sma = s.rolling(term).mean()[:term]
     return list(pd.concat([sma, s[term:]]).ewm(span=term, adjust=False).mean())
   shortEma=shortEma(oneMinuteDataPriceR)[-1]
-  # 一番後ろのデータが最新のEMAになる
+  if math.isnan(shortEma):
+    shortEma = "0"
 
+  # 一番後ろのデータが最新のEMAになる
   # 長期EMA
   def longEma(oneMinuteDataPriceR=[], term = 26):
     s = pd.Series(oneMinuteDataPriceR)
     sma = s.rolling(term).mean()[:term]
     return list(pd.concat([sma, s[term:]]).ewm(span=term, adjust=False).mean())
   longEma = longEma(oneMinuteDataPriceR)[-1]
+  if math.isnan(longEma):
+    longEma = "0"
 
   # MACD
-  MACD = [x - y for (x, y) in zip(shortEma, longEma)]
+  # MACD = [x - y for (x, y) in zip(shortEma, longEma)]
+  try: 
+    MACD = shortEma - longEma
+  except:
+    MACD = "0"
 
   # MACDSignal
   oneMinuteDataMACD = []
@@ -92,31 +109,38 @@ while True:
     return list(pd.concat([sma, s[term:]]).ewm(span=term, adjust=False).mean())
 
   MACDSignal = MACDSignal(oneMinuteDataMACDR)[-1]
+  if math.isnan(MACDSignal):
+    MACDSignal = "0"
 
   # BuySignal
   # 前回のデータがMACD<MACDSignal
-  if oneMinuteDataAll[0][-2] < oneMinuteDataAll[0][-1]:
-  # かつ今回のデータがMACD>MACDSignal
-    if MACD > MACDSignal:
-      BUYSig = True
-    else: 
+  try:
+    if oneMinuteDataAll[0][-2] < oneMinuteDataAll[0][-1]:
+    # かつ今回のデータがMACD>MACDSignal
+      if MACD > MACDSignal:
+        BUYSig = True
+      else: 
+        BUYSig = False
+    else:
       BUYSig = False
-  else:
+  except:
     BUYSig = False
-
-
+    print("buySigError")
 
   # SellSignal
   # 前回のデータがMACD>MACDSignal
-  if oneMinuteDataAll[0][-2] > oneMinuteDataAll[0][-1]:
-  # かつ今回のデータがMACD<MACDSignal
-    if MACD < MACDSignal:
-      SELLSig = True
-    else: 
+  try:
+    if oneMinuteDataAll[0][-2] > oneMinuteDataAll[0][-1]:
+    # かつ今回のデータがMACD<MACDSignal
+      if MACD < MACDSignal:
+        SELLSig = True
+      else: 
+        SELLSig = False
+    else:
       SELLSig = False
-  else:
+  except:
     SELLSig = False
-
+    print("sellSigError")
 
   add_bttable =("INSERT INTO 5min_table "
               "(timestamp, BUYSig, SELLSig, open, close, max, min, shortEma, longEma, MACD, MACDSignal)"

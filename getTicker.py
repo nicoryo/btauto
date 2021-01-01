@@ -43,6 +43,14 @@ conn = mydb.connect(
     # database='bitflyer'
     charset="utf8"
 )
+# conn = mydb.connect(
+#     host='localhost',
+#     port='3306',
+#     user='root',
+#     password='',
+#     database='bitflyer',
+#     charset="utf8"
+# )
 # カーソルを取得する
 cur = conn.cursor()
 
@@ -74,8 +82,8 @@ while True:
     )
 
   # SQL文の実行
-  cur.execute(add_bttable, btdata)
-  conn.commit()
+  # cur.execute(add_bttable, btdata)
+  # conn.commit()
 
   # 指定した秒数だけストップ
   sleep(interval)
