@@ -2,6 +2,8 @@ import pybitflyer
 import mysql.connector as mydb
 from datetime import datetime as dt
 from time import sleep
+import os
+from dotenv import load_dotenv
 
 # APIへアクセス
 api = pybitflyer.API(
@@ -23,16 +25,21 @@ option = ['timestamp','ltp']
 # 取得間隔(秒)
 interval = 10
 
-# Mysqlへのコネクションの作成
+load_dotenv('.env') 
+
+RDShost = os.environ.get("RDShost")
+RDSpass = os.environ.get("RDSpass")
+# coding:utf-8
+# コネクションの作成
 conn = mydb.connect(
     # host='localhost',
-    host='db-bitcoin01.chsa19zjxzmw.ap-northeast-1.rds.amazonaws.com',
+    host='RDShost',
     port='3306',
     db='bitcoin01',
     # user='root',
     user='nicoryo',
     # password='',
-    password='Kaitou1412',
+    password='RDSpass',
     # database='bitflyer'
     charset="utf8"
 )
