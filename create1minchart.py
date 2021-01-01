@@ -55,7 +55,7 @@ while True:
   timestamp = rows[0][1]
 
   # 手前に新しいデータの順でSQLから取得
-  cur.execute("SELECT * FROM 1mins_table ORDER BY id DESC LIMIT 26;")
+  cur.execute("SELECT * FROM 1min_table ORDER BY id DESC LIMIT 26;")
   oneMinuteDataAll = cur.fetchall()
   oneMinuteDataPrice = []
   for i in oneMinuteDataAll:
