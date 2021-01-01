@@ -16,13 +16,13 @@ RDSpass = os.environ.get("RDSpass")
 # コネクションの作成
 conn = mydb.connect(
     # host='localhost',
-    host='RDShost',
+    host=RDShost,
     port='3306',
     db='bitcoin01',
     # user='root',
     user='nicoryo',
     # password='',
-    password='RDSpass',
+    password=RDSpass,
     # database='bitflyer'
     charset="utf8"
 )
