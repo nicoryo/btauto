@@ -65,7 +65,7 @@ while True:
   print(line)
 
   # レコード追加のSQL文
-  add_bttable =("INSERT INTO 1min_table "
+  add_bttable =("INSERT INTO got_data "
                 "(timestamp, price) "
                 "VALUES (%s, %s)"
                 )
@@ -82,8 +82,8 @@ while True:
     )
 
   # SQL文の実行
-  # cur.execute(add_bttable, btdata)
-  # conn.commit()
+  cur.execute(add_bttable, btdata)
+  conn.commit()
 
   # 指定した秒数だけストップ
   sleep(interval)
