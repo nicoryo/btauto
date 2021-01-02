@@ -29,11 +29,11 @@ def buyOrder(buyPrice=[], buySize=[]):
 
 getchildorders = api.getchildorders(product_code="BTC_JPY", child_order_state="active")
 getbalance = api.getbalance(product_code="BTC_JPY")
-jpyAmount = getbalance[0]['amount']
-btcAmount = getbalance[1]['amount']
+# jpyAmount = getbalance[0]['amount']
+# btcAmount = getbalance[1]['amount']
 print(getbalance)
-print(jpyAmount)
-print(type(jpyAmount))
+# print(jpyAmount)
+# print(type(jpyAmount))
 # a = 0
 # if a == 0:
 #   buyPrice = 2800000
