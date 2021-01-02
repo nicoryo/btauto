@@ -144,8 +144,8 @@ while True:
   except:
     comment="5分足シグナルチェッカーシステムにエラーが発生したよ！2分待機！"
     lineNotify.main(comment)
-    sleeep(120)
-    
+    sleep(120)
+
 
 # 買い注文を出すコード
 # sendchildorder = api.sendchildorder(

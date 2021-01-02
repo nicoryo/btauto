@@ -80,6 +80,6 @@ while True:
     # 指定した秒数だけストップ
     sleep(interval)
   except:
-    comment="データ取得システムにエラーが発生したよ！"
-    lineNotify.main(comment)
+    # comment="データ取得システムにエラーが発生したよ！"
+    # lineNotify.main(comment)
     sleep(interval)
