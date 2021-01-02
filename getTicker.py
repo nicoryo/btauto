@@ -54,7 +54,7 @@ while True:
 
     # 保存用にコンマ区切りにする
     line = ','.join([str(ticker[op]) for op in option])
-    print(line)
+    
 
     # レコード追加のSQL文
     add_bttable =("INSERT INTO got_data "

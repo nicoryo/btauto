@@ -155,7 +155,7 @@ while True:
   cur.execute(add_bttable, btdata)
   conn.commit()
 
-  print(btdata)
+  # print(btdata)
 
   sleep(interval)
 

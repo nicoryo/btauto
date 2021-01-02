@@ -141,7 +141,7 @@ while True:
     else:
       sleep(2)
 
-comment="発注システムにエラーが発生したよ！"
+comment="5分足シグナルチェッカーシステムにエラーが発生したよ！"
 lineNotify.main(comment)
 
 # 買い注文を出すコード
