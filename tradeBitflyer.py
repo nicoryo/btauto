@@ -57,8 +57,9 @@ def sellOrder(sellPrice=[], sellSize=[]):
     time_in_force="GTC"
   )
 
-while True:
-  try:
+
+try:
+  while True:
     # アクティブな注文の有無を確認
     ticker = api.ticker(product_code="BTC_JPY")
     getchildorders = api.getchildorders(product_code="BTC_JPY", child_order_state="ACTIVE")
@@ -141,10 +142,10 @@ while True:
           sleep(2)
       else:
         sleep(2)
-  except:
-    comment="発注システムにエラーが発生したよ！30秒待機するね！"
-    lineNotify.main(comment)
-    sleep(30)
+except:
+  comment="発注システムにエラーが発生したよ！30秒待機するね！"
+  lineNotify.main(comment)
+  sleep(30)
 
 # 買い注文を出すコード
 # sendchildorder = api.sendchildorder(
