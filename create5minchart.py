@@ -158,3 +158,7 @@ while True:
   print(btdata)
 
   sleep(interval)
+  
+comment="データ取得システムにエラーが発生したよ！"
+lineNotify.main(comment)
+sleep(interval)
