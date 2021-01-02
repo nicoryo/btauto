@@ -2,8 +2,8 @@ import pybitflyer
 import mysql.connector as mydb
 from datetime import datetime as dt
 from time import sleep
-import os
-from dotenv import load_dotenv
+import setting
+import lineNotify
 
 # APIへアクセス
 api = pybitflyer.API(
@@ -25,65 +25,61 @@ option = ['timestamp','ltp']
 # 取得間隔(秒)
 interval = 10
 
-load_dotenv('.env') 
+API_KEY = setting.API_KEY
+API_SECRET = setting.API_SECRET
+RDShost = setting.RDShost
+RDSpass = setting.RDSpass
+RDSdb   = setting.RDSdb
+RDSuser = setting.RDSuser
 
-RDShost = os.environ.get("RDShost")
-RDSpass = os.environ.get("RDSpass")
 # coding:utf-8
 # コネクションの作成
 conn = mydb.connect(
-    # host='localhost',
-    host=RDShost,
-    port='3306',
-    db='bitcoin01',
-    # user='root',
-    user='nicoryo',
-    # password='',
+    host    =RDShost,
+    port    ='3306',
+    user    =RDSuser,
     password=RDSpass,
-    # database='bitflyer'
+    database=RDSdb,
     charset="utf8"
 )
-# conn = mydb.connect(
-#     host='localhost',
-#     port='3306',
-#     user='root',
-#     password='',
-#     database='bitflyer',
-#     charset="utf8"
-# )
 # カーソルを取得する
 cur = conn.cursor()
 
 print('準備完了')
 
 while True:
-  # 取得
-  ticker = api.ticker(product_code="BTC_JPY")
-
-  # 保存用にコンマ区切りにする
-  line = ','.join([str(ticker[op]) for op in option])
-  print(line)
-
-  # レコード追加のSQL文
-  add_bttable =("INSERT INTO got_data "
-                "(timestamp, price) "
-                "VALUES (%s, %s)"
-                )
-
   try:
-    btdate = dt.strptime(ticker['timestamp'], '%Y-%m-%dT%H:%M:%S.%f')
+    # 取得
+    ticker = api.ticker(product_code="BTC_JPY")
+
+    # 保存用にコンマ区切りにする
+    line = ','.join([str(ticker[op]) for op in option])
+    print(line)
+
+    # レコード追加のSQL文
+    add_bttable =("INSERT INTO got_data "
+                  "(timestamp, price) "
+                  "VALUES (%s, %s)"
+                  )
+
+    try:
+      btdate = dt.strptime(ticker['timestamp'], '%Y-%m-%dT%H:%M:%S.%f')
+    except:
+      btdate = dt.strptime(ticker['timestamp'], '%Y-%m-%dT%H:%M:%S')
+  
+    # パラメータの設定
+    btdata =  (
+        btdate,
+        ticker['ltp']
+      )
+
+    # SQL文の実行
+    cur.execute(add_bttable, btdata)
+    conn.commit()
+
+    # 指定した秒数だけストップ
+    sleep(interval)
   except:
-    btdate = dt.strptime(ticker['timestamp'], '%Y-%m-%dT%H:%M:%S')
- 
-  # パラメータの設定
-  btdata =  (
-      btdate,
-      ticker['ltp']
-    )
-
-  # SQL文の実行
-  cur.execute(add_bttable, btdata)
-  conn.commit()
-
-  # 指定した秒数だけストップ
-  sleep(interval)
+    comment="データ取得システムにエラーが発生したよ！"
+    lineNotify.main(comment)
+    sleep(interval)

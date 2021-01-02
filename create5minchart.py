@@ -2,39 +2,30 @@ import mysql.connector as mydb
 from datetime import datetime as dt
 from time import sleep
 import pandas as pd
-import os
-from dotenv import load_dotenv
+import setting
 import math
+import lineNotify
 
 # 取得間隔(秒)
 interval = 60*5
 
-load_dotenv('.env') 
+API_KEY = setting.API_KEY
+API_SECRET = setting.API_SECRET
+RDShost = setting.RDShost
+RDSpass = setting.RDSpass
+RDSdb   = setting.RDSdb
+RDSuser = setting.RDSuser
 
-RDShost = os.environ.get("RDShost")
-RDSpass = os.environ.get("RDSpass")
 # coding:utf-8
 # コネクションの作成
 conn = mydb.connect(
-    # host='localhost',
-    host=RDShost,
-    port='3306',
-    db='bitcoin01',
-    # user='root',
-    user='nicoryo',
-    # password='',
+    host    =RDShost,
+    port    ='3306',
+    user    =RDSuser,
     password=RDSpass,
-    # database='bitflyer'
+    database=RDSdb,
     charset="utf8"
 )
-# conn = mydb.connect(
-#     host='localhost',
-#     port='3306',
-#     user='root',
-#     password='',
-#     database='bitflyer',
-#     charset="utf8"
-# )
 # カーソルを取得する
 cur = conn.cursor()
 
