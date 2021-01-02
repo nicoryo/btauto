@@ -63,6 +63,7 @@ while True:
   # アクティブな注文の有無を確認
   getchildorders = api.getchildorders(product_code="BTC_JPY", child_order_state="ACTIVE")
   getbalance = api.getbalance(product_code="BTC_JPY")
+  sleep(1)
   jpyAmount = getbalance[0]['amount']
   btcAmount = getbalance[1]['amount']
   cur.execute("SELECT BUYSig, SELLSig, close FROM 1min_table ORDER BY id DESC LIMIT 1;")
