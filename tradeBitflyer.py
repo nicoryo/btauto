@@ -61,7 +61,6 @@ def sellOrder(sellPrice=[], sellSize=[]):
 
 while True:
   # アクティブな注文の有無を確認
-  ticker = api.ticker(product_code="BTC_JPY")
   getchildorders = api.getchildorders(product_code="BTC_JPY", child_order_state="ACTIVE")
   getbalance = api.getbalance(product_code="BTC_JPY")
   jpyAmount = getbalance[0]['amount']
