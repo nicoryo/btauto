@@ -5,6 +5,12 @@ import setting
 import lineNotify
 import math
 
+API_KEY = setting.API_KEY
+API_SECRET = setting.API_SECRET
+RDShost = setting.RDShost
+RDSpass = setting.RDSpass
+RDSdb   = setting.RDSdb
+RDSuser = setting.RDSuser
 
 # coding:utf-8
 # コネクションの作成
