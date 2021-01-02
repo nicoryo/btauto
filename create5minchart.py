@@ -35,7 +35,7 @@ while True:
   rows = cur.fetchall()
   data = []
   for i in rows:
-    data.append(i[-1])
+    data.append(i[5])
 
   # 最大値
   maxinum = max(data)
@@ -44,11 +44,11 @@ while True:
   minimam = min(data)
 
   # 始値
-  open = rows[-1][-1]
+  open = rows[-1][5]
   # print(start)
 
   # 終値
-  close = rows[0][-1]
+  close = rows[0][-5]
   # print(end)
 
   # データ作成時間(1minデータの最新時間とする)
@@ -158,7 +158,7 @@ while True:
   print(btdata)
 
   sleep(interval)
-  
+
 comment="データ取得システムにエラーが発生したよ！"
 lineNotify.main(comment)
 sleep(interval)
