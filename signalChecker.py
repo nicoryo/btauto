@@ -32,7 +32,7 @@ api = pybitflyer.API(
   API_SECRET  
   )
 
-interval = 35
+interval = 60*5
 
 # 買い注文を出すコード
 def buyOrder(buyPrice=[], buySize=[]):
