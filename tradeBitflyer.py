@@ -34,39 +34,36 @@ api = pybitflyer.API(
 
 interval = 35
 
-# 買い注文を出すコード
-def buyOrder(buyPrice=[], buySize=[]):
-  return api.sendchildorder(
-    product_code="BTC_JPY",
-    child_order_type="LIMIT",
-    side="BUY",
-    price=buyPrice,
-    size=buySize,
-    minute_to_expire=10000,
-    time_in_force="GTC"
-  )
-# 売り注文を出すコード
-def sellOrder(sellPrice=[], sellSize=[]):
-  return api.sendchildorder(
-    product_code="BTC_JPY",
-    child_order_type="LIMIT",
-    side="SELL",
-    price=sellPrice,
-    size=sellSize,
-    minute_to_expire=10000,
-    time_in_force="GTC"
-  )
-
-
 
 while True:
   # アクティブな注文の有無を確認
   getchildorders = api.getchildorders(product_code="BTC_JPY", child_order_state="ACTIVE")
   getbalance = api.getbalance(product_code="BTC_JPY")
-  sleep(1)
   jpyAmount = getbalance[0]['amount']
   btcAmount = getbalance[1]['amount']
   cur.execute("SELECT BUYSig, SELLSig, close FROM 1min_table ORDER BY id DESC LIMIT 1;")
+  # 買い注文を出すコード
+  def buyOrder(buyPrice=[], buySize=[]):
+    return api.sendchildorder(
+      product_code="BTC_JPY",
+      child_order_type="LIMIT",
+      side="BUY",
+      price=buyPrice,
+      size=buySize,
+      minute_to_expire=10000,
+      time_in_force="GTC"
+    )
+  # 売り注文を出すコード
+  def sellOrder(sellPrice=[], sellSize=[]):
+    return api.sendchildorder(
+      product_code="BTC_JPY",
+      child_order_type="LIMIT",
+      side="SELL",
+      price=sellPrice,
+      size=sellSize,
+      minute_to_expire=10000,
+      time_in_force="GTC"
+    )
   # print(cur.fetchall())
   oneMinuteDataAll = cur.fetchall()
   conn.commit()

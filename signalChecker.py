@@ -60,87 +60,114 @@ def sellOrder(sellPrice=[], sellSize=[]):
 while True:
   try:
     # アクティブな注文の有無を確認
-    ticker = api.ticker(product_code="BTC_JPY")
-    getchildorders = api.getchildorders(product_code="BTC_JPY", child_order_state="ACTIVE")
-    getbalance = api.getbalance(product_code="BTC_JPY")
-    jpyAmount = getbalance[0]['amount']
-    btcAmount = getbalance[1]['amount']
+    # getchildorders = api.getchildorders(product_code="BTC_JPY", child_order_state="ACTIVE")
+    # getbalance = api.getbalance(product_code="BTC_JPY")
+    # jpyAmount = getbalance[0]['amount']
+    # btcAmount = getbalance[1]['amount']
     cur.execute("SELECT BUYSig, SELLSig, close FROM 5min_table ORDER BY id DESC LIMIT 1;")
     # print(cur.fetchall())
     oneMinuteDataAll = cur.fetchall()
     conn.commit()
 
-    if getchildorders == []: #active order is nothing
-      # print(oneMinuteDataAll[0][0],oneMinuteDataAll[0][1],oneMinuteDataAll[0][2])
-      if oneMinuteDataAll[0][0] == 1:
+    if oneMinuteDataAll[0][0] == 1:
 
-        buyPrice = oneMinuteDataAll[0][-1]
-        # buySize = (math.floor((jpyAmount / buyPrice) * 100000000))/100000000
-        # buyOrder(buyPrice, buySize) # buy order
+      buyPrice = oneMinuteDataAll[0][-1]
+      # buySize = (math.floor((jpyAmount / buyPrice) * 100000000))/100000000
+      # buyOrder(buyPrice, buySize) # buy order
 
-        # print('買い注文:', buyPrice,'/', buySize )
+      # print('買い注文:', buyPrice,'/', buySize )
 
-        comment='5min足で買いシグナル:', buyPrice, 
-        lineNotify.main(comment)
+      comment='5min足で買いシグナル:', buyPrice, 
+      lineNotify.main(comment)
 
-        sleep(interval)
-      elif oneMinuteDataAll[0][1] == 1:
-        
-        sellPrice = oneMinuteDataAll[0][-1]
-        # sellSize =  (math.floor(btcAmount *(1-0.0015)* 100000000)) / 100000000
-        # sellOrder(sellPrice, sellSize) # sell order
-
-        # print('売り注文:', sellPrice, '/', sellSize )
-
-        comment='5min足で売りシグナル:', sellPrice 
-        lineNotify.main(comment)
-
-        sleep(interval)
+      sleep(interval)
+    elif oneMinuteDataAll[0][1] == 1:
       
-      else:
-        sleep(2)
+      sellPrice = oneMinuteDataAll[0][-1]
+      # sellSize =  (math.floor(btcAmount *(1-0.0015)* 100000000)) / 100000000
+      # sellOrder(sellPrice, sellSize) # sell order
 
-    elif getchildorders[0]['side'] == 'BUY':
-      if oneMinuteDataAll[0][0] == 1: # buy signal is true
-        if getchildorders[0]['price'] > oneMinuteDataAll[0][-1]:
-          cancelallchildorders = api.cancelallchildorders(
-            product_code="BTC_JPY"
-          )
+      # print('売り注文:', sellPrice, '/', sellSize )
 
-          buyPrice = oneMinuteDataAll[0][-1]
-          # buySize = (math.floor((jpyAmount / buyPrice) * 100000000))/100000000
-          # buyOrder(buyPrice, buySize) # buy order
+      comment='5min足で売りシグナル:', sellPrice 
+      lineNotify.main(comment)
 
-          # print('買い注文更新:', buyPrice, '/',  buySize )
-
-          # comment='買い注文更新:', buyPrice, '/',  buySize 
-          # lineNotify.main(comment)
-          sleep(interval)
-        else:
-          sleep(2)
-      else:
-        sleep(2)
+      sleep(interval)
+    
     else:
-      if oneMinuteDataAll[0][1] == 1: # sell signal is true
-        if getchildorders[0]['price'] < oneMinuteDataAll[0][-1]:
-          # 注文をキャンセルコード
-          cancelallchildorders = api.cancelallchildorders(
-            product_code="BTC_JPY"
-          )
+      sleep(5)
 
-          sellPrice = oneMinuteDataAll[0][-1]
-          # # sellSize =  (math.floor(btcAmount * 100000000) ) / 100000000
-          # # sellOrder(sellPrice, sellSize) # sell order
-          # # print('売り注文更新:', sellPrice,'/', sellSize )
+    # if getchildorders == []: #active order is nothing
+    #   # print(oneMinuteDataAll[0][0],oneMinuteDataAll[0][1],oneMinuteDataAll[0][2])
+    #   if oneMinuteDataAll[0][0] == 1:
 
-          # # comment='売り注文更新:', sellPrice,'/', sellSize 
-          # lineNotify.main(comment)
+    #     buyPrice = oneMinuteDataAll[0][-1]
+    #     # buySize = (math.floor((jpyAmount / buyPrice) * 100000000))/100000000
+    #     # buyOrder(buyPrice, buySize) # buy order
 
-          sleep(interval) 
-        else:
-          sleep(2)
-      else:
-        sleep(2)
+    #     # print('買い注文:', buyPrice,'/', buySize )
+
+    #     comment='5min足で買いシグナル:', buyPrice, 
+    #     lineNotify.main(comment)
+
+    #     sleep(interval)
+    #   elif oneMinuteDataAll[0][1] == 1:
+        
+    #     sellPrice = oneMinuteDataAll[0][-1]
+    #     # sellSize =  (math.floor(btcAmount *(1-0.0015)* 100000000)) / 100000000
+    #     # sellOrder(sellPrice, sellSize) # sell order
+
+    #     # print('売り注文:', sellPrice, '/', sellSize )
+
+    #     comment='5min足で売りシグナル:', sellPrice 
+    #     lineNotify.main(comment)
+
+    #     sleep(interval)
+      
+    #   else:
+    #     sleep(2)
+
+    # elif getchildorders[0]['side'] == 'BUY':
+    #   if oneMinuteDataAll[0][0] == 1: # buy signal is true
+    #     if getchildorders[0]['price'] > oneMinuteDataAll[0][-1]:
+    #       cancelallchildorders = api.cancelallchildorders(
+    #         product_code="BTC_JPY"
+    #       )
+
+    #       buyPrice = oneMinuteDataAll[0][-1]
+    #       # buySize = (math.floor((jpyAmount / buyPrice) * 100000000))/100000000
+    #       # buyOrder(buyPrice, buySize) # buy order
+
+    #       # print('買い注文更新:', buyPrice, '/',  buySize )
+
+    #       # comment='買い注文更新:', buyPrice, '/',  buySize 
+    #       # lineNotify.main(comment)
+    #       sleep(interval)
+    #     else:
+    #       sleep(2)
+    #   else:
+    #     sleep(2)
+    # else:
+    #   if oneMinuteDataAll[0][1] == 1: # sell signal is true
+    #     if getchildorders[0]['price'] < oneMinuteDataAll[0][-1]:
+    #       # 注文をキャンセルコード
+    #       cancelallchildorders = api.cancelallchildorders(
+    #         product_code="BTC_JPY"
+    #       )
+
+    #       sellPrice = oneMinuteDataAll[0][-1]
+    #       # # sellSize =  (math.floor(btcAmount * 100000000) ) / 100000000
+    #       # # sellOrder(sellPrice, sellSize) # sell order
+    #       # # print('売り注文更新:', sellPrice,'/', sellSize )
+
+    #       # # comment='売り注文更新:', sellPrice,'/', sellSize 
+    #       # lineNotify.main(comment)
+
+    #       sleep(interval) 
+    #     else:
+    #       sleep(2)
+    #   else:
+    #     sleep(2)
   except:
     comment="5分足シグナルチェッカーシステムにエラーが発生したよ！2分待機！"
     lineNotify.main(comment)
