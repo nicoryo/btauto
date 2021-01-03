@@ -33,6 +33,7 @@ api = pybitflyer.API(
   )
 
 interval = 60
+shortsleep = 5
 
 # 買い注文を出すコード
 def buyOrder(buyPrice=[], buySize=[]):
@@ -56,7 +57,24 @@ def sellOrder(sellPrice=[], sellSize=[]):
     minute_to_expire=10000,
     time_in_force="GTC"
   )
+def buyOrderAmount():
+  getbalance  = api.getbalance(product_code="BTC_JPY")
+  getboard    = api.board(product_code="BTC_JPY")
+  jpyAmount   = getbalance[0]['amount']
+  # btcAmount   = getbalance[1]['amount']
+  buyPrice    = getboard["mid_price"]-1000
+  buySize     = (math.floor((jpyAmount / buyPrice) * 100000000))/100000000
+  buyOrder(buyPrice, buySize) # buy order
+  return {"buyPrice":buyPrice,"buySize":buySize}
 
+def sellOrderAmount():
+  getbalance = api.getbalance(product_code="BTC_JPY")
+  # jpyAmount = getbalance[0]['amount']
+  btcAmount = getbalance[1]['amount']
+  sellPrice = oneMinuteDataAll[0][-1]
+  sellSize =  (math.floor(btcAmount *(1-0.0015)* 100000000)) / 100000000
+  sellOrder(sellPrice, sellSize) # sell order
+  return {"sellPrice":sellPrice,"sellSize":sellSize}
 
 try:
   while True:
@@ -71,21 +89,13 @@ try:
       if getchildorders == []: #active order is nothing
 
         # お財布状況（リファクタリング候補）
-        getbalance = api.getbalance(product_code="BTC_JPY")
-        getboard = api.board(product_code="BTC_JPY")
+        buyOrderResult = buyOrderAmount()
+        # print('買い注文:', buyOrderResult["buyPrice"],'/', buyOrderResult["buySize"] )
 
-        jpyAmount = getbalance[0]['amount']
-        btcAmount = getbalance[1]['amount']
-        buyPrice = getboard["mid_price"]-1000
-        buySize = (math.floor((jpyAmount / buyPrice) * 100000000))/100000000
-        buyOrder(buyPrice, buySize) # buy order
-
-        print('買い注文:', buyPrice,'/', buySize )
-
-        comment='買い注文:', buyPrice,'/', buySize 
+        comment='買い注文:', buyOrderResult["buyPrice"],'/', buyOrderResult["buySize"] 
         lineNotify.main(comment)
+        sleep(shortsleep)
 
-        sleep(2)
         while api.getchildorders(product_code="BTC_JPY")[0]['child_order_state'] == "ACTIVE":
           getchildorders = api.getchildorders(product_code="BTC_JPY")[0]
           if getchildorders['side'] == 'BUY':
@@ -93,26 +103,26 @@ try:
             cancelallchildorders = api.cancelallchildorders(
               product_code="BTC_JPY"
             )
-            getbalance = api.getbalance(product_code="BTC_JPY")
-            getboard = api.board(product_code="BTC_JPY")
+            buyOrderResult = buyOrderAmount()
 
-            jpyAmount = getbalance[0]['amount']
-            btcAmount = getbalance[1]['amount']
-            buyPrice = getboard["mid_price"]-1000
-            buySize = (math.floor((jpyAmount / buyPrice) * 100000000))/100000000
-            buyOrder(buyPrice, buySize) # buy order
-
-            comment='買い注文訂正:', buyPrice,'/', buySize 
+            comment='買い注文訂正:', buyOrderResult["buyPrice"],'/',buyOrderResult["buySize"] 
             lineNotify.main(comment)
+            sleep(shortsleep)
 
-            sleep(2)
-        
-        # 約定通知
-        getchildorders = api.getchildorders(product_code="BTC_JPY")[0]
-        comment='買い注文約定:', getchildorders['price'],'/', getchildorders['size']
-        lineNotify.main(comment)
+        sleep(shortsleep)
+        if api.getchildorders(product_code="BTC_JPY")[0]['child_order_state'] == "CANCELED":
+          comment='注文失敗！どんまい'
+          lineNotify.main(comment)
+        elif api.getchildorders(product_code="BTC_JPY")[0]['child_order_state'] == "REJECTED":
+          comment='注文失敗！どんまい'
+          lineNotify.main(comment)
+        else:
+          # 約定通知
+          getchildorders = api.getchildorders(product_code="BTC_JPY")[0]
+          comment='買い注文約定:', getchildorders['price'],'/', getchildorders['size']
+          lineNotify.main(comment)
 
-        sleep(interval)
+          sleep(interval)
       
       # elif getchildorders[0]['child_order_state'] == 'ACTIVE'
       #   ['side'] == 'BUY':
@@ -137,7 +147,7 @@ try:
       #   else:
       #     sleep(2)
       else:
-        sleep(2)
+        sleep(shortsleep)
     
     # 売りシグナルが発生した場合
     elif oneMinuteDataAll[0][1] == 1:
@@ -145,19 +155,14 @@ try:
       if getchildorders == []: #active order is nothing
         
         # お財布状況（リファクタリング候補）
-        getbalance = api.getbalance(product_code="BTC_JPY")
-        jpyAmount = getbalance[0]['amount']
-        btcAmount = getbalance[1]['amount']
-        sellPrice = oneMinuteDataAll[0][-1]
-        sellSize =  (math.floor(btcAmount *(1-0.0015)* 100000000)) / 100000000
-        sellOrder(sellPrice, sellSize) # sell order
+        sellOrderResult = sellOrderAmount()
 
-        print('売り注文:', sellPrice, '/', sellSize )
+        print('売り注文:', sellOrderResult["sellPrice"], '/', sellOrderResult["sellSize"] )
 
-        comment='売り注文:', sellPrice, '/', sellSize 
+        comment='売り注文:', sellOrderResult["sellPrice"], '/', sellOrderResult["sellSize"] 
         lineNotify.main(comment)
 
-        sleep(2)
+        sleep(shortsleep)
         while api.getchildorders(product_code="BTC_JPY")[0]['child_order_state'] == "ACTIVE":
           getchildorders = api.getchildorders(product_code="BTC_JPY")[0]
           if getchildorders['side'] == 'SELL':
@@ -165,25 +170,26 @@ try:
             cancelallchildorders = api.cancelallchildorders(
               product_code="BTC_JPY"
             )
-            getbalance = api.getbalance(product_code="BTC_JPY")
-            getboard = api.board(product_code="BTC_JPY")
+            sellOrderResult = sellOrderAmount()
 
-            jpyAmount = getbalance[0]['amount']
-            btcAmount = getbalance[1]['amount']
-            sellPrice = getboard["mid_price"]+1000
-            sellSize = (math.floor((jpyAmount / buyPrice) * 100000000))/100000000
-            sellOrder(sellPrice, sellSize) # sell order
-
-            comment='売り注文訂正:', sellPrice,'/', sellSize 
+            comment='売り注文訂正:', sellOrderResult["sellPrice"], '/', sellOrderResult["sellSize"] 
             lineNotify.main(comment)
 
-            sleep(2)
-        # 約定通知    
-        getchildorders = api.getchildorders(product_code="BTC_JPY")[0]
-        comment='売り注文約定:', getchildorders['price'],'/', getchildorders['size']
-        lineNotify.main(comment)
-        
-        sleep(interval)
+            sleep(shortsleep)
+        sleep(shortsleep)    
+        if api.getchildorders(product_code="BTC_JPY")[0]['child_order_state'] == "CANCELED":
+          comment='注文失敗！どんまい'
+          lineNotify.main(comment)
+        elif api.getchildorders(product_code="BTC_JPY")[0]['child_order_state'] == "REJECTED":
+          comment='注文失敗！どんまい'
+          lineNotify.main(comment)
+        else:
+          # 約定通知    
+          getchildorders = api.getchildorders(product_code="BTC_JPY")[0]
+          comment='売り注文約定:', sellOrderResult["sellPrice"], '/', sellOrderResult["sellSize"]
+          lineNotify.main(comment)
+          
+          sleep(interval)
       # elif getchildorders[0]['side'] == 'SELL':
       #   if getchildorders[0]['price'] < oneMinuteDataAll[0][-1]:
       #     # 注文をキャンセルコード
@@ -215,7 +221,7 @@ try:
       # else:
       #   sleep(2)
     else:
-      sleep(2)
+      sleep(shortsleep)
 except:
   comment="発注システムにエラーが発生したよ！停止させるね！どんまい！"
   lineNotify.main(comment)

@@ -3,6 +3,7 @@ import setting
 import lineNotify
 import decimal
 import math
+import adjustMysql
 
 API_KEY = setting.API_KEY
 API_SECRET = setting.API_SECRET
@@ -27,38 +28,37 @@ def buyOrder(buyPrice=[], buySize=[]):
     time_in_force="GTC"
   )
 
-getboard = api.board(product_code="BTC_JPY")
-getchildorders = api.getchildorders(product_code="BTC_JPY")[0]
-getbalance = api.getbalance(product_code="BTC_JPY")
-# jpyAmount = getbalance[0]['amount']
-# btcAmount = getbalance[1]['amount']
-# print(getbalance)
-print(getboard["mid_price"])
-print(getboard["mid_price"]-1000)
-print(getchildorders)
-# if getchildorders['child_order_state'] == "ACTIVE":
-if api.getchildorders(product_code="BTC_JPY")[0]['child_order_state'] == "ACTIVE":
-  if getchildorders['side'] == 'SELL':
-    print("OK")
-  elif getchildorders['side'] == []:
-    print("CA")
-  else:
-    print("NG")
-# print(jpyAmount)
-# print(type(jpyAmount))
-# a = 0
-# if a == 0:
-#   buyPrice = 2800000
-#   # decimal.getcontext().prec = 6
-#   # buySize = decimal.Decimal(jpyAmount / buyPrice).quantize(Decimal('.00000001'), rounding=ROUND_DOWN)
-#   # buySize = decimal.Decimal(jpyAmount / buyPrice)
-#   # buySize = round(jpyAmount / buyPrice, 8)
-#   buySize = (math.floor((jpyAmount / buyPrice) * 100000000))/100000000
-#   print(buySize)
-#   print(type(buySize))
-#   buyOrder(buyPrice, buySize)
-  # comment='買い注文 :', buyPrice, '/', buySize
-# lineNotify.main(comment)
+def buyOrderAmount():
+  getbalance  = api.getbalance(product_code="BTC_JPY")
+  getboard    = api.board(product_code="BTC_JPY")
+  jpyAmount   = getbalance[0]['amount']
+  # btcAmount   = getbalance[1]['amount']
+  # buyPrice    = getboard["mid_price"]-1000
+  buyPrice    = 2800000
+  # buySize     = (math.floor((jpyAmount / buyPrice) * 100000000))/100000000
+  buySize     = 0.001
+  buyOrder(buyPrice, buySize) # buy order
+  return {"buyPrice":buyPrice, "buySize":buySize}
 
+# buy = buyOrderAmount()
+# print(buy["buyPrice"])
 
-# print('買い注文 :', buyPrice, '/', buySize )
+adjustMysql.main()
+
+# getboard = api.board(product_code="BTC_JPY")
+# getchildorders = api.getchildorders(product_code="BTC_JPY")[0]
+# getbalance = api.getbalance(product_code="BTC_JPY")
+# # jpyAmount = getbalance[0]['amount']
+# # btcAmount = getbalance[1]['amount']
+# # print(getbalance)
+# print(getboard["mid_price"])
+# print(getboard["mid_price"]-1000)
+# print(getchildorders)
+# # if getchildorders['child_order_state'] == "ACTIVE":
+# if api.getchildorders(product_code="BTC_JPY")[0]['child_order_state'] == "ACTIVE":
+#   if getchildorders['side'] == 'SELL':
+#     print("OK")
+#   elif getchildorders['side'] == []:
+#     print("CA")
+#   else:
+#     print("NG")

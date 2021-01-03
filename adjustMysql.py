@@ -8,45 +8,49 @@ RDSpass = setting.RDSpass
 RDSdb   = setting.RDSdb
 RDSuser = setting.RDSuser
 # coding:utf-8
-# コネクションの作成
-conn = mydb.connect(
-    host    =RDShost,
-    port    ='3306',
-    user    =RDSuser,
-    password=RDSpass,
-    database=RDSdb,
-    charset="utf8"
-)
+def main():
+  # コネクションの作成
+  conn = mydb.connect(
+      host    =RDShost,
+      port    ='3306',
+      user    =RDSuser,
+      password=RDSpass,
+      database=RDSdb,
+      charset="utf8"
+  )
 
-# カーソルを取得する
-cur = conn.cursor()
+  # カーソルを取得する
+  cur = conn.cursor()
 
-cur.execute(
-  """
-    DELETE FROM 
-      1min_table 
-    WHERE 
-      timestamp < DATE_SUB( CURDATE(),INTERVAL 5 DAY );
-  """
-)
-conn.commit()
+  cur.execute(
+    """
+      DELETE FROM 
+        1min_table 
+      WHERE 
+        timestamp < DATE_SUB( CURDATE(),INTERVAL 5 DAY );
+    """
+  )
+  conn.commit()
 
-cur.execute(
-  """
-    DELETE FROM 
-      5min_table 
-    WHERE 
-      timestamp < DATE_SUB( CURDATE(),INTERVAL 5 DAY );
-  """
-)
-conn.commit()
+  cur.execute(
+    """
+      DELETE FROM 
+        5min_table 
+      WHERE 
+        timestamp < DATE_SUB( CURDATE(),INTERVAL 5 DAY );
+    """
+  )
+  conn.commit()
 
-cur.execute(
-  """
-    DELETE FROM 
-      got_data
-    WHERE 
-      timestamp < DATE_SUB( CURDATE(),INTERVAL 5 DAY );
-  """
-)
-conn.commit()
+  cur.execute(
+    """
+      DELETE FROM 
+        got_data
+      WHERE 
+        timestamp < DATE_SUB( CURDATE(),INTERVAL 5 DAY );
+    """
+  )
+  conn.commit()
+
+if __name__ == "__main__":
+    main()
