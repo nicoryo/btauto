@@ -27,11 +27,23 @@ def buyOrder(buyPrice=[], buySize=[]):
     time_in_force="GTC"
   )
 
-getchildorders = api.getchildorders(product_code="BTC_JPY", child_order_state="active")
+getboard = api.board(product_code="BTC_JPY")
+getchildorders = api.getchildorders(product_code="BTC_JPY")[0]
 getbalance = api.getbalance(product_code="BTC_JPY")
 # jpyAmount = getbalance[0]['amount']
 # btcAmount = getbalance[1]['amount']
-print(getbalance)
+# print(getbalance)
+print(getboard["mid_price"])
+print(getboard["mid_price"]-1000)
+print(getchildorders)
+# if getchildorders['child_order_state'] == "ACTIVE":
+if api.getchildorders(product_code="BTC_JPY")[0]['child_order_state'] == "ACTIVE":
+  if getchildorders['side'] == 'SELL':
+    print("OK")
+  elif getchildorders['side'] == []:
+    print("CA")
+  else:
+    print("NG")
 # print(jpyAmount)
 # print(type(jpyAmount))
 # a = 0

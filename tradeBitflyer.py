@@ -72,9 +72,11 @@ try:
 
         # お財布状況（リファクタリング候補）
         getbalance = api.getbalance(product_code="BTC_JPY")
+        getboard = api.board(product_code="BTC_JPY")
+
         jpyAmount = getbalance[0]['amount']
         btcAmount = getbalance[1]['amount']
-        buyPrice = oneMinuteDataAll[0][-1]
+        buyPrice = getboard["mid_price"]-1000
         buySize = (math.floor((jpyAmount / buyPrice) * 100000000))/100000000
         buyOrder(buyPrice, buySize) # buy order
 
@@ -82,29 +84,58 @@ try:
 
         comment='買い注文:', buyPrice,'/', buySize 
         lineNotify.main(comment)
+
+        sleep(2)
+        while api.getchildorders(product_code="BTC_JPY")[0]['child_order_state'] == "ACTIVE":
+          getchildorders = api.getchildorders(product_code="BTC_JPY")[0]
+          if getchildorders['side'] == 'BUY':
+            # お財布状況（リファクタリング候補）
+            cancelallchildorders = api.cancelallchildorders(
+              product_code="BTC_JPY"
+            )
+            getbalance = api.getbalance(product_code="BTC_JPY")
+            getboard = api.board(product_code="BTC_JPY")
+
+            jpyAmount = getbalance[0]['amount']
+            btcAmount = getbalance[1]['amount']
+            buyPrice = getboard["mid_price"]-1000
+            buySize = (math.floor((jpyAmount / buyPrice) * 100000000))/100000000
+            buyOrder(buyPrice, buySize) # buy order
+
+            comment='買い注文訂正:', buyPrice,'/', buySize 
+            lineNotify.main(comment)
+
+            sleep(2)
+        
+        # 約定通知
+        getchildorders = api.getchildorders(product_code="BTC_JPY")[0]
+        comment='買い注文約定:', getchildorders['price'],'/', getchildorders['size']
+        lineNotify.main(comment)
+
         sleep(interval)
       
-      elif getchildorders[0]['side'] == 'BUY':
-        if getchildorders[0]['price'] > oneMinuteDataAll[0][-1]:
-          cancelallchildorders = api.cancelallchildorders(
-            product_code="BTC_JPY"
-          )
+      # elif getchildorders[0]['child_order_state'] == 'ACTIVE'
+      #   ['side'] == 'BUY':
+      #   if getchildorders[0]['price'] > oneMinuteDataAll[0][-1]:
+      #     cancelallchildorders = api.cancelallchildorders(
+      #       product_code="BTC_JPY"
+      #     )
 
-          # お財布状況（リファクタリング候補）
-          getbalance = api.getbalance(product_code="BTC_JPY")
-          jpyAmount = getbalance[0]['amount']
-          btcAmount = getbalance[1]['amount']
-          buyPrice = oneMinuteDataAll[0][-1]
-          buySize = (math.floor((jpyAmount / buyPrice) * 100000000))/100000000
-          buyOrder(buyPrice, buySize) # buy order
+      #     # お財布状況（リファクタリング候補）
+      #     getbalance = api.getbalance(product_code="BTC_JPY")
+      #     jpyAmount = getbalance[0]['amount']
+      #     btcAmount = getbalance[1]['amount']
+      #     buyPrice = oneMinuteDataAll[0][-1]
+      #     buySize = (math.floor((jpyAmount / buyPrice) * 100000000))/100000000
+      #     buyOrder(buyPrice, buySize) # buy order
 
-          print('買い注文更新:', buyPrice, '/',  buySize )
+      #     print('買い注文更新:', buyPrice, '/',  buySize )
 
-          comment='買い注文更新:', buyPrice, '/',  buySize 
-          lineNotify.main(comment)
-          sleep(interval)
-        else:
-          sleep(2)
+      #     comment='買い注文更新:', buyPrice, '/',  buySize 
+      #     lineNotify.main(comment)
+      #     sleep(interval)
+      #   else:
+      #     sleep(2)
       else:
         sleep(2)
     
@@ -126,37 +157,63 @@ try:
         comment='売り注文:', sellPrice, '/', sellSize 
         lineNotify.main(comment)
 
-        sleep(interval)
-      elif getchildorders[0]['side'] == 'SELL':
-        if getchildorders[0]['price'] < oneMinuteDataAll[0][-1]:
-          # 注文をキャンセルコード
-          cancelallchildorders = api.cancelallchildorders(
-            product_code="BTC_JPY"
-          )
-
-          # お財布状況（リファクタリング候補）
-          getbalance = api.getbalance(product_code="BTC_JPY")
-          jpyAmount = getbalance[0]['amount']
-          btcAmount = getbalance[1]['amount']
-          sellPrice = oneMinuteDataAll[0][-1]
-          sellSize =  (math.floor(btcAmount *(1-0.0015)* 100000000)) / 100000000
-          sellOrder(sellPrice, sellSize) # sell order
-
-          print('売り注文更新:', sellPrice,'/', sellSize )
-
-          comment='売り注文更新:', sellPrice,'/', sellSize 
-          lineNotify.main(comment)
-
-          sleep(interval)
-        else:
-          sleep(2)
-      elif getchildorders[0]['side'] == 'BUY':
-        cancelallchildorders = api.cancelallchildorders(
-          product_code="BTC_JPY"
-        )
-        sleep(interval)    
-      else:
         sleep(2)
+        while api.getchildorders(product_code="BTC_JPY")[0]['child_order_state'] == "ACTIVE":
+          getchildorders = api.getchildorders(product_code="BTC_JPY")[0]
+          if getchildorders['side'] == 'SELL':
+            # お財布状況（リファクタリング候補）
+            cancelallchildorders = api.cancelallchildorders(
+              product_code="BTC_JPY"
+            )
+            getbalance = api.getbalance(product_code="BTC_JPY")
+            getboard = api.board(product_code="BTC_JPY")
+
+            jpyAmount = getbalance[0]['amount']
+            btcAmount = getbalance[1]['amount']
+            sellPrice = getboard["mid_price"]+1000
+            sellSize = (math.floor((jpyAmount / buyPrice) * 100000000))/100000000
+            sellOrder(sellPrice, sellSize) # sell order
+
+            comment='売り注文訂正:', sellPrice,'/', sellSize 
+            lineNotify.main(comment)
+
+            sleep(2)
+        # 約定通知    
+        getchildorders = api.getchildorders(product_code="BTC_JPY")[0]
+        comment='売り注文約定:', getchildorders['price'],'/', getchildorders['size']
+        lineNotify.main(comment)
+        
+        sleep(interval)
+      # elif getchildorders[0]['side'] == 'SELL':
+      #   if getchildorders[0]['price'] < oneMinuteDataAll[0][-1]:
+      #     # 注文をキャンセルコード
+      #     cancelallchildorders = api.cancelallchildorders(
+      #       product_code="BTC_JPY"
+      #     )
+
+      #     # お財布状況（リファクタリング候補）
+      #     getbalance = api.getbalance(product_code="BTC_JPY")
+      #     jpyAmount = getbalance[0]['amount']
+      #     btcAmount = getbalance[1]['amount']
+      #     sellPrice = oneMinuteDataAll[0][-1]
+      #     sellSize =  (math.floor(btcAmount *(1-0.0015)* 100000000)) / 100000000
+      #     sellOrder(sellPrice, sellSize) # sell order
+
+      #     print('売り注文更新:', sellPrice,'/', sellSize )
+
+      #     comment='売り注文更新:', sellPrice,'/', sellSize 
+      #     lineNotify.main(comment)
+
+      #     sleep(interval)
+      #   else:
+      #     sleep(2)
+      # elif getchildorders[0]['side'] == 'BUY':
+      #   cancelallchildorders = api.cancelallchildorders(
+      #     product_code="BTC_JPY"
+      #   )
+      #   sleep(interval)    
+      # else:
+      #   sleep(2)
     else:
       sleep(2)
 except:
