@@ -65,7 +65,7 @@ def sellTrade():
     if not api.getchildorders(product_code="BTC_JPY")[0]['child_order_state'] == "ACTIVE":
       Amount = sellOrderAmount()
       sellOrder(Amount["sellPrice"],Amount["sellSize"])
-      # print('売り注文:', sellOrderResult["sellPrice"],'/', sellOrderResult["sellSize"] )
+      print('売り注文:', Amount["sellPrice"],'/', Amount["sellSize"] )
       comment='売り注文:', Amount["sellPrice"],'/', Amount["sellSize"] 
       lineNotify.main(comment)
       sleep(shortsleep)

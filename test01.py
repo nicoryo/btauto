@@ -1,12 +1,12 @@
 import pybitflyer
 import setting
 import lineNotify
-import decimal
+# import decimal
 import math
-import adjustMysql
+# import adjustMysql
 import datetime
 import time
-import test
+# import test
 import buyTradeBitflyer
 import sellTradeBitflyer
 
@@ -30,4 +30,4 @@ api = pybitflyer.API(
 # TEST = api.getchildorders(product_code="BTC_JPY")[0]['child_order_state']
 # print(TEST)
 
-buyTradeBitflyer.buyTrade()
+sellTradeBitflyer.sellTrade()
