@@ -55,7 +55,7 @@ try:
         buyTradeBitflyer.buyTrade()
         sleep(interval)
 
-    elif MACD_n_minus1 > MACD_n_minus1:
+    elif MACD_n_minus1 > MACDSignal_n_minus1:
       if MACD_n < MACDSignal_n:
         sellTradeBitflyer.sellTrade()
         sleep(interval)   
