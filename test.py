@@ -6,6 +6,7 @@ import math
 import adjustMysql
 import datetime
 import time
+import mysql.connector as mydb
 
 API_KEY = setting.API_KEY
 API_SECRET = setting.API_SECRET
@@ -19,33 +20,29 @@ api = pybitflyer.API(
   API_KEY,
   API_SECRET  
   )
-def buyOrder(buyPrice=[], buySize=[]):
-  return api.sendchildorder(
-    product_code="BTC_JPY",
-    child_order_type="LIMIT",
-    side="BUY",
-    price=buyPrice,
-    size=buySize,
-    minute_to_expire=10000,
-    time_in_force="GTC"
+
+conn = mydb.connect(
+    host    =RDShost,
+    port    ='3306',
+    user    =RDSuser,
+    password=RDSpass,
+    database=RDSdb,
+    charset="utf8"
+)
+# カーソルを取得する
+cur = conn.cursor()
+
+api = pybitflyer.API(
+  API_KEY,
+  API_SECRET  
   )
 
-def buyOrderAmount():
-  getbalance  = api.getbalance(product_code="BTC_JPY")
-  getboard    = api.board(product_code="BTC_JPY")
-  jpyAmount   = getbalance[0]['amount']
-  # btcAmount   = getbalance[1]['amount']
-  # buyPrice    = getboard["mid_price"]-1000
-  buyPrice    = 2800000
-  # buySize     = (math.floor((jpyAmount / buyPrice) * 100000000))/100000000
-  buySize     = 0.001
-  buyOrder(buyPrice, buySize) # buy order
-  return {"buyPrice":buyPrice, "buySize":buySize}
+interval = 1
 
-# buy = buyOrderAmount()
-# print(buy["buyPrice"])
-
-
+cur.execute("SELECT MACD, MACDSignal FROM 1min_table ORDER BY id DESC LIMIT 2;")
+oneMinuteDataAll = cur.fetchall()
+conn.commit()
+print(oneMinuteDataAll)
 def job():
   return(datetime.datetime.now()) 
 
@@ -54,23 +51,3 @@ def main():
 
 if __name__ == "__job__":
     job()
-# print(job())
-
-
-# getboard = api.board(product_code="BTC_JPY")
-# getchildorders = api.getchildorders(product_code="BTC_JPY")[0]
-# getbalance = api.getbalance(product_code="BTC_JPY")
-# # jpyAmount = getbalance[0]['amount']
-# # btcAmount = getbalance[1]['amount']
-# # print(getbalance)
-# print(getboard["mid_price"])
-# print(getboard["mid_price"]-1000)
-# print(getchildorders)
-# # if getchildorders['child_order_state'] == "ACTIVE":
-# if api.getchildorders(product_code="BTC_JPY")[0]['child_order_state'] == "ACTIVE":
-#   if getchildorders['side'] == 'SELL':
-#     print("OK")
-#   elif getchildorders['side'] == []:
-#     print("CA")
-#   else:
-#     print("NG")
