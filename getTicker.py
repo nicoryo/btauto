@@ -44,44 +44,44 @@ def main():
   )
   # カーソルを取得する
   cur = conn.cursor()
-try:
-    # 取得
-    ticker = api.ticker(product_code="BTC_JPY")
+  try:
+      # 取得
+      ticker = api.ticker(product_code="BTC_JPY")
 
-    # 保存用にコンマ区切りにする
-    line = ','.join([str(ticker[op]) for op in option])
-    print(line)
+      # 保存用にコンマ区切りにする
+      line = ','.join([str(ticker[op]) for op in option])
+      print(line)
+      
+
+      # レコード追加のSQL文
+      add_bttable =("INSERT INTO got_data "
+                    "(timestamp, price) "
+                    "VALUES (%s, %s)"
+                    )
+
+      try:
+        btdate = dt.strptime(ticker['timestamp'], '%Y-%m-%dT%H:%M:%S.%f')
+      except:
+        btdate = dt.strptime(ticker['timestamp'], '%Y-%m-%dT%H:%M:%S')
+
+      # パラメータの設定
+      btdata =  (
+          btdate,
+          ticker['ltp']
+        )
+
+      # SQL文の実行
+      cur.execute(add_bttable, btdata)
+      conn.commit()
+
+      # 指定した秒数だけストップ
+      # sleep(interval)
     
-
-    # レコード追加のSQL文
-    add_bttable =("INSERT INTO got_data "
-                  "(timestamp, price) "
-                  "VALUES (%s, %s)"
-                  )
-
-    try:
-      btdate = dt.strptime(ticker['timestamp'], '%Y-%m-%dT%H:%M:%S.%f')
+      # comment="データ取得システムにエラーが発生したよ！"
+      # lineNotify.main(comment)
+      # sleep(interval)
     except:
-      btdate = dt.strptime(ticker['timestamp'], '%Y-%m-%dT%H:%M:%S')
-
-    # パラメータの設定
-    btdata =  (
-        btdate,
-        ticker['ltp']
-      )
-
-    # SQL文の実行
-    cur.execute(add_bttable, btdata)
-    conn.commit()
-
-    # 指定した秒数だけストップ
-    # sleep(interval)
-  
-    # comment="データ取得システムにエラーが発生したよ！"
-    # lineNotify.main(comment)
-    # sleep(interval)
-  except:
-    print("cause error")
+      print("cause error")
 
 if __name__ == "__main__":
     main()
