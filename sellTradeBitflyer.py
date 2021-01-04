@@ -56,7 +56,7 @@ def sellOrderAmount():
   sellPrice = getboard["mid_price"]+1000
   # sellPrice   = 3300000
   sellSize =  (math.floor(btcAmount *(1-0.0015)* 100000000)) / 100000000
-  # sellOrder(sellPrice, sellSize) # sell order
+  sellOrder(sellPrice, sellSize) # sell order
   return {"sellPrice":sellPrice,"sellSize":sellSize}
 
 # 売り注文から約定まで
