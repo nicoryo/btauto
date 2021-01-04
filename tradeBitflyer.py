@@ -103,6 +103,7 @@ try:
             cancelallchildorders = api.cancelallchildorders(
               product_code="BTC_JPY"
             )
+            sleep(1)
             buyOrderResult = buyOrderAmount()
 
             comment='買い注文訂正:', buyOrderResult["buyPrice"],'/',buyOrderResult["buySize"] 
@@ -113,9 +114,11 @@ try:
         if api.getchildorders(product_code="BTC_JPY")[0]['child_order_state'] == "CANCELED":
           comment='注文失敗！どんまい'
           lineNotify.main(comment)
+          sleep(shortsleep)
         elif api.getchildorders(product_code="BTC_JPY")[0]['child_order_state'] == "REJECTED":
           comment='注文失敗！どんまい'
           lineNotify.main(comment)
+          sleep(shortsleep)
         else:
           # 約定通知
           getchildorders = api.getchildorders(product_code="BTC_JPY")[0]
@@ -170,6 +173,7 @@ try:
             cancelallchildorders = api.cancelallchildorders(
               product_code="BTC_JPY"
             )
+            sleep(1)
             sellOrderResult = sellOrderAmount()
 
             comment='売り注文訂正:', sellOrderResult["sellPrice"], '/', sellOrderResult["sellSize"] 
@@ -180,9 +184,11 @@ try:
         if api.getchildorders(product_code="BTC_JPY")[0]['child_order_state'] == "CANCELED":
           comment='注文失敗！どんまい'
           lineNotify.main(comment)
+          sleep(shortsleep)
         elif api.getchildorders(product_code="BTC_JPY")[0]['child_order_state'] == "REJECTED":
           comment='注文失敗！どんまい'
           lineNotify.main(comment)
+          sleep(shortsleep)
         else:
           # 約定通知    
           getchildorders = api.getchildorders(product_code="BTC_JPY")[0]
