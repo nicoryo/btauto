@@ -36,31 +36,31 @@ interval = 1
 
 try:
   while True:
-  cur.execute("SELECT MACD, MACDSignal FROM 1min_table ORDER BY id DESC LIMIT 2;")
-  oneMinuteDataAll = cur.fetchall()
-  conn.commit()
+    cur.execute("SELECT MACD, MACDSignal FROM 1min_table ORDER BY id DESC LIMIT 2;")
+    oneMinuteDataAll = cur.fetchall()
+    conn.commit()
 
-  MACD_n_minus1 = oneMinuteDataAll[1][-2]
-  MACDSignal_n_minus1 = oneMinuteDataAll[1][-1]
-  MACD_n = oneMinuteDataAll[0][-2]
-  MACDSignal_n = oneMinuteDataAll[0][-1]
+    MACD_n_minus1 = oneMinuteDataAll[1][-2]
+    MACDSignal_n_minus1 = oneMinuteDataAll[1][-1]
+    MACD_n = oneMinuteDataAll[0][-2]
+    MACDSignal_n = oneMinuteDataAll[0][-1]
 
-  # print(Amount["buyPrice"])
-  # cur.close()
-  # conn.close()
+    # print(Amount["buyPrice"])
+    # cur.close()
+    # conn.close()
 
-  if MACD_n_minus1 < MACDSignal_n_minus1:
-  # かつ今回のデータがMACD>MACDSignal
-    if MACD_n > MACDSignal_n:
-      buyTradeBitflyer.buyTrade()
+    if MACD_n_minus1 < MACDSignal_n_minus1:
+    # かつ今回のデータがMACD>MACDSignal
+      if MACD_n > MACDSignal_n:
+        buyTradeBitflyer.buyTrade()
+        sleep(interval)
+
+    elif MACD_n_minus1 > MACD_n_minus1:
+      if MACD_n < MACDSignal_n:
+        sellTradeBitflyer.sellTrade()
+        sleep(interval)   
+    else:
       sleep(interval)
-
-  elif MACD_n_minus1 > MACD_n_minus1:
-    if MACD_n < MACDSignal_n:
-      sellTradeBitflyer.sellTrade()
-      sleep(interval)   
-  else:
-    sleep(interval)
 
 except:
   comment='Algorithm Error have been ocurred!' 
