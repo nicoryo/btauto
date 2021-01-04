@@ -47,11 +47,14 @@ def buyOrderAmount():
 
 
 def job():
-  return(datetime.datetime.now())
-  print(datetime.datetime.now())
-  print("I'm working...")  
+  return(datetime.datetime.now()) 
 
-print(job())
+def main():
+  return("main") 
+
+if __name__ == "__job__":
+    job()
+# print(job())
 
 
 # getboard = api.board(product_code="BTC_JPY")
