@@ -50,9 +50,7 @@ def main():
 
       # 保存用にコンマ区切りにする
       line = ','.join([str(ticker[op]) for op in option])
-      print(line)
-      
-
+  
       # レコード追加のSQL文
       add_bttable =("INSERT INTO got_data "
                     "(timestamp, price) "
@@ -80,8 +78,10 @@ def main():
       # comment="データ取得システムにエラーが発生したよ！"
       # lineNotify.main(comment)
       # sleep(interval)
-    except:
-      print("cause error")
+  except:
+      comment="データ取得システムにエラーが発生したよ！20秒止めて様子みるよ！"
+      lineNotify.main(comment)
+      sleep(20)
 
 if __name__ == "__main__":
     main()
