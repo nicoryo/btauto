@@ -4,6 +4,8 @@ import lineNotify
 import decimal
 import math
 import adjustMysql
+import datetime
+import time
 
 API_KEY = setting.API_KEY
 API_SECRET = setting.API_SECRET
@@ -43,7 +45,14 @@ def buyOrderAmount():
 # buy = buyOrderAmount()
 # print(buy["buyPrice"])
 
-adjustMysql.main()
+
+def job():
+  return(datetime.datetime.now())
+  print(datetime.datetime.now())
+  print("I'm working...")  
+
+print(job())
+
 
 # getboard = api.board(product_code="BTC_JPY")
 # getchildorders = api.getchildorders(product_code="BTC_JPY")[0]

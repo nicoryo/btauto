@@ -1,36 +1,39 @@
 import mysql.connector as mydb
 from datetime import datetime as dt
+import schedule
+import time
 from time import sleep
 import pandas as pd
 import setting
 import math
 import lineNotify
 
-# 取得間隔(秒)
-interval = 60*5
+def main():
+  # 取得間隔(秒)
+  interval = 60*5
 
-API_KEY = setting.API_KEY
-API_SECRET = setting.API_SECRET
-RDShost = setting.RDShost
-RDSpass = setting.RDSpass
-RDSdb   = setting.RDSdb
-RDSuser = setting.RDSuser
+  API_KEY = setting.API_KEY
+  API_SECRET = setting.API_SECRET
+  RDShost = setting.RDShost
+  RDSpass = setting.RDSpass
+  RDSdb   = setting.RDSdb
+  RDSuser = setting.RDSuser
 
-# coding:utf-8
-# コネクションの作成
-conn = mydb.connect(
-    host    =RDShost,
-    port    ='3306',
-    user    =RDSuser,
-    password=RDSpass,
-    database=RDSdb,
-    charset="utf8"
-)
-# カーソルを取得する
-cur = conn.cursor()
+  # coding:utf-8
+  # コネクションの作成
+  conn = mydb.connect(
+      host    =RDShost,
+      port    ='3306',
+      user    =RDSuser,
+      password=RDSpass,
+      database=RDSdb,
+      charset="utf8"
+  )
+  # カーソルを取得する
+  cur = conn.cursor()
 
-try:
-  while True:
+  try:
+    # while True:
     cur.execute("SELECT * FROM 1min_table ORDER BY id DESC LIMIT 5;")
     rows = cur.fetchall()
     data = []
@@ -155,9 +158,12 @@ try:
     cur.execute(add_bttable, btdata)
     conn.commit()
 
-    # print(btdata)
+    print(btdata)
 
-    sleep(interval)
-except:
-  comment="データ取得システムにエラーが発生したよ！"
-  lineNotify.main(comment)
+    # sleep(interval)
+  except:
+    comment="データ取得システムにエラーが発生したよ！"
+    lineNotify.main(comment)
+
+if __name__ == "__main__":
+    main()

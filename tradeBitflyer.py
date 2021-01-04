@@ -69,9 +69,10 @@ def buyOrderAmount():
 
 def sellOrderAmount():
   getbalance = api.getbalance(product_code="BTC_JPY")
+  getboard    = api.board(product_code="BTC_JPY")
   # jpyAmount = getbalance[0]['amount']
   btcAmount = getbalance[1]['amount']
-  sellPrice = oneMinuteDataAll[0][-1]
+  sellPrice = getboard["mid_price"]+1000
   sellSize =  (math.floor(btcAmount *(1-0.0015)* 100000000)) / 100000000
   sellOrder(sellPrice, sellSize) # sell order
   return {"sellPrice":sellPrice,"sellSize":sellSize}
