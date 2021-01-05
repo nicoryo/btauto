@@ -38,16 +38,24 @@ api = pybitflyer.API(
   )
 
 interval = 1
+get = api.getchildorders(product_code="BTC_JPY")
+getexecutions = api.getexecutions(product_code="BTC_JPY")
+for i in range(10):
+  print(getexecutions[i]['side'], getexecutions[i]['price'], getexecutions[i]['size'], getexecutions[i]['exec_date'])
+# print(get[0]['child_order_state'])
+# print(getexecutions)
+# for i in range(50):
+#   print(get[i]['child_order_state'])
 
-cur.execute("SELECT MACD, MACDSignal FROM 1min_table ORDER BY id DESC LIMIT 2;")
-oneMinuteDataAll = cur.fetchall()
-conn.commit()
-print(oneMinuteDataAll)
+# cur.execute("SELECT MACD, MACDSignal FROM 1min_table ORDER BY id DESC LIMIT 2;")
+# oneMinuteDataAll = cur.fetchall()
+# conn.commit()
+# print(oneMinuteDataAll)
 def job():
   return(datetime.datetime.now()) 
 
 def main():
   return("main") 
 
-if __name__ == "__job__":
+if __name__ == "__main__":
     job()
