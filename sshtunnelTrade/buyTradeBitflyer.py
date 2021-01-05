@@ -5,6 +5,8 @@ import setting
 import lineNotify
 import math
 # from sshtunnel import SSHTunnelForwarder
+import datetime
+from datetime import datetime as dt
 
 API_KEY = setting.API_KEY
 API_SECRET = setting.API_SECRET
@@ -64,6 +66,9 @@ def buyOrderAmount():
   getbalance  = api.getbalance(product_code="BTC_JPY")
   getboard    = api.board(product_code="BTC_JPY")
   jpyAmount   = getbalance[0]['amount']
+  if jpyAmount > 50000:
+    jpyAmount = 50000
+  # btcAmount   = getbalance[1]['amount']
   # btcAmount   = getbalance[1]['amount']
   buyPrice    = getboard["mid_price"]-1000
   buySize     = (math.floor((jpyAmount / buyPrice) * 100000000))/100000000
@@ -83,11 +88,14 @@ def buyTrade():
       sleep(shortsleep)
 
       while not api.getchildorders(product_code="BTC_JPY")[0]['child_order_state'] == "COMPLETED":
-        while api.getchildorders(product_code="BTC_JPY")[0]['child_order_state'] == "ACTIVE":
+        if api.getchildorders(product_code="BTC_JPY")[0]['child_order_state'] == "ACTIVE":
           # お財布状況（リファクタリング候補）
           api.cancelallchildorders(product_code="BTC_JPY")
           sleep(1)
           Amount = buyOrderAmount()
+
+          if Amount["buySize"] < 0.0001:
+            break
           buyOrder(Amount["buyPrice"],Amount["buySize"])
 
           comment='買い注文訂正:', Amount["buyPrice"],'/',Amount["buySize"] 
@@ -101,17 +109,26 @@ def buyTrade():
           sleep(shortsleep)
           break
 
-      if api.getchildorders(product_code="BTC_JPY")[0]['child_order_state'] == "CANCELED":
+        if api.getchildorders(product_code="BTC_JPY")[0]['child_order_state'] == "CANCELED":
+          sleep(shortsleep)
+          break
+            
+      # 約定通知
+      getexecutions = api.getexecutions(product_code="BTC_JPY")[0]
+      try:
+        exectime = dt.strptime(getexecutions['exec_date'], '%Y-%m-%dT%H:%M:%S.%f')
+      except:
+        exectime = dt.strptime(getexecutions['exec_date'], '%Y-%m-%dT%H:%M:%S')
+      if exectime.minute == datetime.datetime.now().minute:
+        comment='買い注文約定:', getexecutions['price'],'/', getexecutions['size']
+        lineNotify.main(comment)
+        sleep(interval)
+      else:
         getexecutions = api.getexecutions(product_code="BTC_JPY")[1]
         comment='買い注文約定?:', getexecutions['price'],'/', getexecutions['size']
         lineNotify.main(comment)
-        sleep(shortsleep)
+        sleep(interval)
 
-      # 約定通知
-      getexecutions = api.getexecutions(product_code="BTC_JPY")[0]
-      comment='買い注文約定:', getexecutions['price'],'/', getexecutions['size']
-      lineNotify.main(comment)
-      sleep(interval)
   except:
     comment='Please check buy trade system'
     lineNotify.main(comment)

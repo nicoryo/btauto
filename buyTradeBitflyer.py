@@ -79,7 +79,7 @@ def buyTrade():
           sleep(1)
           Amount = buyOrderAmount()
 
-          if Amount["buySize"] < 0.001:
+          if Amount["buySize"] < 0.0001:
             break
           buyOrder(Amount["buyPrice"],Amount["buySize"])
 
