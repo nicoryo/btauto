@@ -5,7 +5,6 @@ import setting
 import buyTradeBitflyer
 import sellTradeBitflyer
 import lineNotify
-from sshtunnel import SSHTunnelForwarder
 
 API_KEY = setting.API_KEY
 API_SECRET = setting.API_SECRET
