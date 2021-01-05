@@ -104,12 +104,12 @@ def sellTrade():
       except:
         exectime = dt.strptime(getexecutions['exec_date'], '%Y-%m-%dT%H:%M:%S')
       if exectime.minute == datetime.datetime.now().minute:
-        comment='買い注文約定:', getexecutions['price'],'/', getexecutions['size']
+        comment='売り注文約定:', getexecutions['price'],'/', getexecutions['size']
         lineNotify.main(comment)
         sleep(interval)
       else:
         getexecutions = api.getexecutions(product_code="BTC_JPY")[1]
-        comment='買い注文約定?:', getexecutions['price'],'/', getexecutions['size']
+        comment='売り注文約定?:', getexecutions['price'],'/', getexecutions['size']
         lineNotify.main(comment)
         sleep(interval)
   except:
