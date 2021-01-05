@@ -87,6 +87,11 @@ def sellTrade():
           lineNotify.main(comment)
           sleep(shortsleep)
           break
+      if api.getchildorders(product_code="BTC_JPY")[0]['child_order_state'] == "CANCELED":
+          getexecutions = api.getexecutions(product_code="BTC_JPY")[1]
+          comment='売り注文約定?:', getexecutions['price'],'/', getexecutions['size']
+          lineNotify.main(comment)
+          sleep(shortsleep)
 
       # 約定通知
       getexecutions = api.getexecutions(product_code="BTC_JPY")[0]
