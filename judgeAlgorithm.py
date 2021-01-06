@@ -37,7 +37,7 @@ interval = 1
 
 try:
   while True:
-    cur.execute("SELECT MACD, MACDSignal FROM 1min_table ORDER BY id DESC LIMIT 2;")
+    cur.execute("SELECT MACD, MACDSignal FROM 5min_table ORDER BY id DESC LIMIT 2;")
     oneMinuteDataAll = cur.fetchall()
     conn.commit()
 

@@ -34,7 +34,7 @@ api = pybitflyer.API(
   API_SECRET  
   )
 
-interval = 60
+interval = 60*5
 shortsleep = 5
 
 # 買い注文を出すコード
