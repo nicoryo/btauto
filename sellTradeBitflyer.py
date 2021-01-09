@@ -63,13 +63,13 @@ def sellOrderAmount():
   return {"sellPrice":sellPrice,"sellSize":sellSize}
 
 # 売り注文から約定まで
-def sellTrade():
+def sellTrade(interval=[]):
   try:
     if not api.getchildorders(product_code="BTC_JPY")[0]['child_order_state'] == "ACTIVE":
       Amount = sellOrderAmount()
       sellOrder(Amount["sellPrice"],Amount["sellSize"])
       print('売り注文:', Amount["sellPrice"],'/', Amount["sellSize"] )
-      comment='売り注文:', Amount["sellPrice"],'/', Amount["sellSize"] 
+      comment='●売り注文'
       lineNotify.main(comment)
       sleep(shortsleep)
 
@@ -83,8 +83,8 @@ def sellTrade():
             break
           sellOrder(Amount["sellPrice"],Amount["sellSize"])
 
-          comment='売り注文訂正:', Amount["sellPrice"],'/',Amount["sellSize"] 
-          lineNotify.main(comment)
+          # comment='売り注文訂正:', Amount["sellPrice"],'/',Amount["sellSize"] 
+          # lineNotify.main(comment)
           sleep(shortsleep)
 
         elif api.getchildorders(product_code="BTC_JPY")[0]['child_order_state'] == "REJECTED":
@@ -104,12 +104,14 @@ def sellTrade():
       except:
         exectime = dt.strptime(getexecutions['exec_date'], '%Y-%m-%dT%H:%M:%S')
       if exectime.minute == datetime.datetime.now().minute:
-        comment='売り注文約定:', getexecutions['price'],'/', getexecutions['size']
+        # comment='売り注文約定:', getexecutions['price'],'/', getexecutions['size']
+        comment='●売り注文約定', getexecutions['price']
         lineNotify.main(comment)
         sleep(interval)
       else:
         getexecutions = api.getexecutions(product_code="BTC_JPY")[1]
-        comment='売り注文約定?:', getexecutions['price'],'/', getexecutions['size']
+        # comment='売り注文約定?:', getexecutions['price'],'/', getexecutions['size']
+        comment='●売り注文約定',getexecutions['price']
         lineNotify.main(comment)
         sleep(interval)
   except:

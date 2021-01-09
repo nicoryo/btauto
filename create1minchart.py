@@ -10,8 +10,8 @@ def main():
   # 取得間隔(秒)
   # interval = 60
 
-  API_KEY = setting.API_KEY
-  API_SECRET = setting.API_SECRET
+  # API_KEY = setting.API_KEY
+  # API_SECRET = setting.API_SECRET
   RDShost = setting.RDShost
   RDSpass = setting.RDSpass
   RDSdb   = setting.RDSdb

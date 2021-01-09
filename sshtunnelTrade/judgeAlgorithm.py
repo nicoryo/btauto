@@ -1,6 +1,7 @@
 import mysql.connector as mydb
 import pybitflyer
 from time import sleep
+import pandas as pd
 import setting
 import buyTradeBitflyer
 import sellTradeBitflyer
@@ -22,7 +23,7 @@ server = SSHTunnelForwarder(
     ssh_host_key=None,
     ssh_username='ec2-user',
     ssh_password=None,
-    ssh_pkey='./bitcoin_step_saver01.pem',
+    ssh_pkey='bitcoino1pem.pem',
     remote_bind_address=(RDShost, 3306),
     local_bind_address=('127.0.0.1',10022)
 )
@@ -46,36 +47,73 @@ api = pybitflyer.API(
   API_SECRET  
   )
 
+def shortEma(oneMinuteDataPriceR=[], term = 12):
+  s = pd.Series(oneMinuteDataPriceR)
+  sma = s.rolling(term).mean()[:term]
+  return list(pd.concat([sma, s[term:]]).ewm(span=term, adjust=False).mean())
+
+def longEma(oneMinuteDataPriceR=[], term = 26):
+  s = pd.Series(oneMinuteDataPriceR)
+  sma = s.rolling(term).mean()[:term]
+  return list(pd.concat([sma, s[term:]]).ewm(span=term, adjust=False).mean())
+
+def MACDSignal(oneMinuteDataMACDR=[], term = 9):
+  s = pd.Series(oneMinuteDataMACDR)
+  sma = s.rolling(term).mean()[:term]
+  return list(pd.concat([sma, s[term:]]).ewm(span=term, adjust=False).mean())
+
 interval = 1
+intervaltime = 60*5
 
-try:
-  while True:
-    cur.execute("SELECT MACD, MACDSignal FROM 5min_table ORDER BY id DESC LIMIT 2;")
-    oneMinuteDataAll = cur.fetchall()
-    conn.commit()
+# try:
+while True:
+  ticker = api.ticker(product_code="BTC_JPY")
 
-    MACD_n_minus1 = oneMinuteDataAll[1][-2]
-    MACDSignal_n_minus1 = oneMinuteDataAll[1][-1]
-    MACD_n = oneMinuteDataAll[0][-2]
-    MACDSignal_n = oneMinuteDataAll[0][-1]
+  cur.execute("SELECT * FROM 5min_table ORDER BY id DESC LIMIT 25;")
+  # cur.execute("SELECT * FROM 1min_table ORDER BY id DESC LIMIT 25;")
+  oneMinuteDataAll = cur.fetchall()
+  oneMinuteDataPrice = [ticker['ltp']]
+  conn.commit()
 
-    if MACD_n_minus1 < MACDSignal_n_minus1:
-    # かつ今回のデータがMACD>MACDSignal
-      if MACD_n > MACDSignal_n:
-        # buyTradeBitflyer.buyTrade()
-        comment='Remote buy order test 5min'
-        lineNotify.main(comment)
-        sleep(60)
+  for i in oneMinuteDataAll:
+    oneMinuteDataPrice.append(i[5])
 
-    elif MACD_n_minus1 > MACDSignal_n_minus1:
-      if MACD_n < MACDSignal_n:
-        # sellTradeBitflyer.sellTrade()
-        comment='Remote sell order test 5min'
-        lineNotify.main(comment)
-        sleep(60)   
-    else:
-      sleep(interval)
+  oneMinuteDataPriceR = list(reversed(oneMinuteDataPrice))
 
-except:
-  comment='Algorithm Error have been ocurred!' 
-  lineNotify.main(comment)
+  ShortEma  = shortEma(oneMinuteDataPriceR)[-1]
+  LongEma   = longEma(oneMinuteDataPriceR)[-1]
+
+  MACD = ShortEma - LongEma
+
+  # MACDSignal
+  oneMinuteDataMACD = [MACD]
+  for i in oneMinuteDataAll:
+    oneMinuteDataMACD.append(i[-2])
+
+  oneMinuteDataMACDR = list(reversed(oneMinuteDataMACD))
+
+  MacdSignal = MACDSignal(oneMinuteDataMACDR)[-1]
+
+  MACDNMinus1 = oneMinuteDataAll[0][-2]
+  MACDSignalNMinus1 = oneMinuteDataAll[0][-1]
+
+  sleep(2)
+
+  if MACDNMinus1 < MACDSignalNMinus1:
+  # かつ今回のデータがMACD>MACDSignal
+    if MACD > MacdSignal:
+      buyTradeBitflyer.buyTrade(intervaltime)
+      # comment='Remote buy order test 5min'
+      # lineNotify.main(comment)
+
+  elif MACDNMinus1 > MACDSignalNMinus1:
+    if MACD < MacdSignal:
+      sellTradeBitflyer.sellTrade(intervaltime)
+      # comment='Remote sell order test 5min'
+      # lineNotify.main(comment)   
+  else:
+    sleep(interval)
+
+# except:
+#   comment='Algorithm Error have been ocurred!' 
+#   lineNotify.main(comment)

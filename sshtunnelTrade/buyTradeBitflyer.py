@@ -15,31 +15,6 @@ RDSpass = setting.RDSpass
 RDSdb   = setting.RDSdb
 RDSuser = setting.RDSuser
 
-# coding:utf-8
-# コネクションの作成
-# server = SSHTunnelForwarder(
-#     ('54.150.52.37', 22),
-#     ssh_host_key=None,
-#     ssh_username='ec2-user',
-#     ssh_password=None,
-#     ssh_pkey='./bitcoin_step_saver01.pem',
-#     remote_bind_address=(RDShost, 3306),
-#     local_bind_address=('127.0.0.1',10022)
-# )
-# print("STEP1 server start")
-# # server.start()
-# conn = mydb.connect(
-#     host    ='127.0.0.1',
-#     port    =10022,
-#     user    =RDSuser,
-#     password=RDSpass,
-#     database=RDSdb,
-#     charset="utf8"
-# )
-
-# # カーソルを取得する
-# cur = conn.cursor()
-
 # APIへアクセス
 api = pybitflyer.API(
   API_KEY,
@@ -76,14 +51,15 @@ def buyOrderAmount():
   return {"buyPrice":buyPrice,"buySize":buySize}
 
 # 買い注文から約定まで
-def buyTrade():
+def buyTrade(interval=[]):
   try:
     if not api.getchildorders(product_code="BTC_JPY")[0]['child_order_state'] == "ACTIVE":
       # お財布状況（リファクタリング候補）
       Amount = buyOrderAmount()
       buyOrder(Amount["buyPrice"],Amount["buySize"])
       # print('買い注文:', buyOrderResult["buyPrice"],'/', buyOrderResult["buySize"] )
-      comment='買い注文:', Amount["buyPrice"],'/', Amount["buySize"] 
+      # comment='買い注文:', Amount["buyPrice"],'/', Amount["buySize"] 
+      comment='○買い注文'
       lineNotify.main(comment)
       sleep(shortsleep)
 
@@ -98,18 +74,17 @@ def buyTrade():
             break
           buyOrder(Amount["buyPrice"],Amount["buySize"])
 
-          comment='買い注文訂正:', Amount["buyPrice"],'/',Amount["buySize"] 
-          lineNotify.main(comment)
+          # comment='買い注文訂正:', Amount["buyPrice"],'/',Amount["buySize"] 
+          # lineNotify.main(comment)
           sleep(shortsleep)
 
-        sleep(shortsleep)
-        if api.getchildorders(product_code="BTC_JPY")[0]['child_order_state'] == "REJECTED":
+        elif api.getchildorders(product_code="BTC_JPY")[0]['child_order_state'] == "REJECTED":
           comment='注文失敗！注文やめまーす！どんまい'
           lineNotify.main(comment)
           sleep(shortsleep)
           break
 
-        if api.getchildorders(product_code="BTC_JPY")[0]['child_order_state'] == "CANCELED":
+        elif api.getchildorders(product_code="BTC_JPY")[0]['child_order_state'] == "CANCELED":
           sleep(shortsleep)
           break
             
@@ -120,12 +95,14 @@ def buyTrade():
       except:
         exectime = dt.strptime(getexecutions['exec_date'], '%Y-%m-%dT%H:%M:%S')
       if exectime.minute == datetime.datetime.now().minute:
-        comment='買い注文約定:', getexecutions['price'],'/', getexecutions['size']
+        # comment='買い注文約定:', getexecutions['price'],'/', getexecutions['size']
+        comment= '○買い注文約定',getexecutions['price']
         lineNotify.main(comment)
         sleep(interval)
       else:
         getexecutions = api.getexecutions(product_code="BTC_JPY")[1]
-        comment='買い注文約定?:', getexecutions['price'],'/', getexecutions['size']
+        # comment='買い注文約定?:', getexecutions['price'],'/', getexecutions['size']
+        comment='○買い注文約定?',getexecutions['price']
         lineNotify.main(comment)
         sleep(interval)
 
@@ -135,4 +112,3 @@ def buyTrade():
 
 if __name__ == "__main__":
     buyTrade()
-

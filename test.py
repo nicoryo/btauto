@@ -52,9 +52,9 @@ def buyOrder(buyPrice=[], buySize=[]):
 
 # 買い注文の値段と量を調整するコード
 def buyOrderAmount():
-  getbalance  = api.getbalance(product_code="BTC_JPY")
-  getboard    = api.board(product_code="BTC_JPY")
-  jpyAmount   = getbalance[0]['amount']
+  # getbalance  = api.getbalance(product_code="BTC_JPY")
+  # getboard    = api.board(product_code="BTC_JPY")
+  # jpyAmount   = getbalance[0]['amount']
   # btcAmount   = getbalance[1]['amount']
   buyPrice    = 2800000
   buySize     = 0.001
@@ -78,19 +78,25 @@ def buyOrderAmount():
 #   print("a")
 #   if Amount["buySize"] < 0.002:
 #     break
-num = 0
-while True:
-  if num <100:
-    print(num)
-    if num > 10:
-      print("step1")
-      break
-    num = num + 1
-print("step2")
-print(datetime.datetime.now().minute)
+# num = 0
+# while True:
+#   if num <100:
+#     print(num)
+#     if num > 10:
+#       print("step1")
+#       break
+#     num = num + 1
+# print("step2")
+# print(datetime.datetime.now().minute)
 # print(api.getchildorders(product_code="BTC_JPY")[0]['child_order_state'])
 # time.sleep(5)
 # print(api.getchildorders(product_code="BTC_JPY")[0]['child_order_state'])
+ticker = api.ticker(product_code="BTC_JPY")
+print(ticker)
+print(api.ticker(product_code="BTC_JPY"))
+time.sleep(10)
+print(ticker)
+
 
 
 def job():

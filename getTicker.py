@@ -11,7 +11,7 @@ def main():
     
     )
   # 取得するデータを選択する
-  option = ['timestamp','ltp']
+  # option = ['timestamp','ltp']
 
   # best_ask：最高買価格
   # best_bid：最低売価格
@@ -25,8 +25,8 @@ def main():
   # 取得間隔(秒)
   # interval = 10
 
-  API_KEY = setting.API_KEY
-  API_SECRET = setting.API_SECRET
+  # API_KEY = setting.API_KEY
+  # API_SECRET = setting.API_SECRET
   RDShost = setting.RDShost
   RDSpass = setting.RDSpass
   RDSdb   = setting.RDSdb
@@ -49,7 +49,7 @@ def main():
       ticker = api.ticker(product_code="BTC_JPY")
 
       # 保存用にコンマ区切りにする
-      line = ','.join([str(ticker[op]) for op in option])
+      # line = ','.join([str(ticker[op]) for op in option])
   
       # レコード追加のSQL文
       add_bttable =("INSERT INTO got_data "
