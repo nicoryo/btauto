@@ -15,7 +15,7 @@ RDShost     = os.environ.get("RDShost")
 RDSpass     = os.environ.get("RDSpass")
 RDSport     = os.environ.get("RDSport")
 
-Host        = os.environ.get("Localhost")
+Host        = os.environ.get("Host")
 Port        = os.environ.get("Port")
 Db          = os.environ.get("Db")
 User        = os.environ.get("User")
