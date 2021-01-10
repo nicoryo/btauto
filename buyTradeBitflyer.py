@@ -84,7 +84,7 @@ def buyTrade(interval=[]):
           buyOrder(Amount["buyPrice"],Amount["buySize"])
 
           # comment='買い注文訂正:', Amount["buyPrice"],'/',Amount["buySize"] 
-          lineNotify.main(comment)
+          # lineNotify.main(comment)
           sleep(shortsleep)
 
         elif api.getchildorders(product_code="BTC_JPY")[0]['child_order_state'] == "REJECTED":
