@@ -10,10 +10,6 @@ from datetime import datetime as dt
 
 API_KEY = setting.API_KEY
 API_SECRET = setting.API_SECRET
-RDShost = setting.RDShost
-RDSpass = setting.RDSpass
-RDSdb   = setting.RDSdb
-RDSuser = setting.RDSuser
 
 # APIへアクセス
 api = pybitflyer.API(

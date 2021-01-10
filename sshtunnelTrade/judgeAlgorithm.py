@@ -10,34 +10,46 @@ from sshtunnel import SSHTunnelForwarder
 
 API_KEY = setting.API_KEY
 API_SECRET = setting.API_SECRET
-RDShost = setting.RDShost
-RDSpass = setting.RDSpass
-RDSdb   = setting.RDSdb
-RDSuser = setting.RDSuser
 
-interval = 60
-# coding:utf-8
-# コネクションの作成
-server = SSHTunnelForwarder(
-    ('54.150.52.37', 22),
-    ssh_host_key=None,
-    ssh_username='ec2-user',
-    ssh_password=None,
-    ssh_pkey='bitcoino1pem.pem',
-    remote_bind_address=(RDShost, 3306),
-    local_bind_address=('127.0.0.1',10022)
-)
+RDShost     = setting.RDShost
+RDSpass     = setting.RDSpass
+RDSport     = setting.RDSport
 
-server.start()
-print("STEP1 server start")
+Host        = setting.Host
+Port        = setting.Port
+Db          = setting.Db
+User        = setting.User
+
+SSHadress   = setting.SSHadress
+SSHusername = setting.SSHusername
+SSHpkey     = setting.SSHpkey
+
+ENV         = setting.ENV
+
+if ENV == 'local':
+  # coding:utf-8
+  # コネクションの作成
+  server = SSHTunnelForwarder(
+      ('54.150.52.37', 22),
+      ssh_host_key        = None,
+      ssh_username        = SSHusername,
+      ssh_password        = None,
+      ssh_pkey            = SSHpkey,
+      remote_bind_address = (RDShost, 3306),
+      local_bind_address  = ('127.0.0.1',10022)
+  )
+  server.start()
+  print("STEP1 server start")
+
 conn = mydb.connect(
-    host    ='127.0.0.1',
-    port    =10022,
-    user    =RDSuser,
+    host    =Host,
+    port    =Port,
+    user    =User,
     password=RDSpass,
-    database=RDSdb,
+    database=Db,
     charset="utf8"
 )
+
 print('STEP2 get cursor')
 # カーソルを取得する
 cur = conn.cursor()
@@ -65,55 +77,55 @@ def MACDSignal(oneMinuteDataMACDR=[], term = 9):
 interval = 1
 intervaltime = 60*5
 
-# try:
-while True:
-  ticker = api.ticker(product_code="BTC_JPY")
+try:
+  while True:
+    ticker = api.ticker(product_code="BTC_JPY")
 
-  cur.execute("SELECT * FROM 5min_table ORDER BY id DESC LIMIT 25;")
-  # cur.execute("SELECT * FROM 1min_table ORDER BY id DESC LIMIT 25;")
-  oneMinuteDataAll = cur.fetchall()
-  oneMinuteDataPrice = [ticker['ltp']]
-  conn.commit()
+    cur.execute("SELECT * FROM 5min_table ORDER BY id DESC LIMIT 25;")
+    # cur.execute("SELECT * FROM 1min_table ORDER BY id DESC LIMIT 25;")
+    oneMinuteDataAll = cur.fetchall()
+    oneMinuteDataPrice = [ticker['ltp']]
+    conn.commit()
 
-  for i in oneMinuteDataAll:
-    oneMinuteDataPrice.append(i[5])
+    for i in oneMinuteDataAll:
+      oneMinuteDataPrice.append(i[5])
 
-  oneMinuteDataPriceR = list(reversed(oneMinuteDataPrice))
+    oneMinuteDataPriceR = list(reversed(oneMinuteDataPrice))
 
-  ShortEma  = shortEma(oneMinuteDataPriceR)[-1]
-  LongEma   = longEma(oneMinuteDataPriceR)[-1]
+    ShortEma  = shortEma(oneMinuteDataPriceR)[-1]
+    LongEma   = longEma(oneMinuteDataPriceR)[-1]
 
-  MACD = ShortEma - LongEma
+    MACD = ShortEma - LongEma
 
-  # MACDSignal
-  oneMinuteDataMACD = [MACD]
-  for i in oneMinuteDataAll:
-    oneMinuteDataMACD.append(i[-2])
+    # MACDSignal
+    oneMinuteDataMACD = [MACD]
+    for i in oneMinuteDataAll:
+      oneMinuteDataMACD.append(i[-2])
 
-  oneMinuteDataMACDR = list(reversed(oneMinuteDataMACD))
+    oneMinuteDataMACDR = list(reversed(oneMinuteDataMACD))
 
-  MacdSignal = MACDSignal(oneMinuteDataMACDR)[-1]
+    MacdSignal = MACDSignal(oneMinuteDataMACDR)[-1]
 
-  MACDNMinus1 = oneMinuteDataAll[0][-2]
-  MACDSignalNMinus1 = oneMinuteDataAll[0][-1]
+    MACDNMinus1 = oneMinuteDataAll[0][-2]
+    MACDSignalNMinus1 = oneMinuteDataAll[0][-1]
 
-  sleep(2)
+    sleep(2)
 
-  if MACDNMinus1 < MACDSignalNMinus1:
-  # かつ今回のデータがMACD>MACDSignal
-    if MACD > MacdSignal:
-      buyTradeBitflyer.buyTrade(intervaltime)
-      # comment='Remote buy order test 5min'
-      # lineNotify.main(comment)
+    if MACDNMinus1 < MACDSignalNMinus1:
+    # かつ今回のデータがMACD>MACDSignal
+      if MACD > MacdSignal:
+        buyTradeBitflyer.buyTrade(intervaltime)
+        # comment='Remote buy order test 5min'
+        # lineNotify.main(comment)
 
-  elif MACDNMinus1 > MACDSignalNMinus1:
-    if MACD < MacdSignal:
-      sellTradeBitflyer.sellTrade(intervaltime)
-      # comment='Remote sell order test 5min'
-      # lineNotify.main(comment)   
-  else:
-    sleep(interval)
+    elif MACDNMinus1 > MACDSignalNMinus1:
+      if MACD < MacdSignal:
+        sellTradeBitflyer.sellTrade(intervaltime)
+        # comment='Remote sell order test 5min'
+        # lineNotify.main(comment)   
+    else:
+      sleep(interval)
 
-# except:
-#   comment='Algorithm Error have been ocurred!' 
-#   lineNotify.main(comment)
+except:
+  comment='Algorithm Error have been ocurred!' 
+  lineNotify.main(comment)
